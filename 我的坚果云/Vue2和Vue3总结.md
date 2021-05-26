@@ -1,4 +1,4 @@
-#  Vue2 面试题
+#  Vue2
 
 ### 简单
 
@@ -57,12 +57,83 @@ MVVM 与 MVC 最大的区别就是：它实现了 View 和 Model 的自动同步
 #### 3 Vue 组件通讯有哪几种方式
 
 1. props 和$emit 父组件向子组件传递数据是通过 prop 传递的，子组件传递数据给父组件是通过$emit 触发事件来做到的
-2. $parent,$children 获取当前组件的父组件和当前组件的子组件
-3. $attrs 和$listeners A->B->C。Vue 2.4 开始提供了$attrs 和$listeners 来解决这个问题 (跨级)
-4. 父组件中通过 provide 来提供变量，然后在子组件中通过 inject 来注入变量。(官方不推荐在实际业务中使用，但是写组件库时很常用) (跨级)
-5. $refs 获取组件实例
-6. envetBus 兄弟组件数据传递 这种情况下可以使用事件总线的方式， 这种方法通过**一个空的 Vue实例作为中央事件总线（事件中心**），用它来触发事件和监听事件，从而实现任何组件间的通信，包括父子、隔代、兄弟组件
-7. vuex 状态管理 (跨级)
+
+```javascript
+.sync
+<comp :foo.sync="bar"></comp>
+会被扩展为：
+<comp :foo="bar" @update:foo="val => bar = val"></comp>
+当子组件需要更新 foo 的值时，它需要显式地触发一个更新事件：
+this.$emit('update:foo', newValue)
+
+Vue3  v-model:app="..."
+<!--父组件--!>
+ <HelloWorld v-model:foo="modelValue" v-model:message="msg"></HelloWorld>
+<!--子组件--!>
+  <input type="text" :value="foo" @input="$emit('update:foo', $event.target.value)" />
+
+ <input type="text" :value="message" @input="$emit('update:message', $event.target.value)" />
+     自定义修饰符的用法，
+
+根据官方
+
+//父组件
+
+<HelloWorld v-model.capitalize="myText"></HelloWorld>
+{{myText}}
+setup(){
+	return {  myText : ref(22); } //不加ref无法做到响应
+}
+
+//子组件
+//自定义修饰符 capitalize  通过modelModifiers prop 提供给组件 忽视any
+ <input type="text" :value="modelValue" @input="emitValue" />
+  props: {
+    modelValue: String,
+    modelModifiers: {
+      default: () => ({ capitalize: false })
+    }
+  },
+  created() {
+    console.log(this.modelModifiers); // { capitalize: true }
+  },
+  methods: {
+    emitValue(e: any) {
+      let value: any = e.target.value;
+      if (this.modelModifiers.capitalize) {
+        value = value.charAt(0).toUpperCase() + value.slice(1);
+      }
+      this.$emit("update:modelValue", value);
+    }
+  }  
+
+//对于带参数的 v-model 绑定
+
+ <vModel v-model:foo.capitalize="bar"></vModel>
+   props: {
+    foo: {
+      type: String
+    },
+    fooModifiers: {
+      type: String
+    }
+  }
+  created() {
+    console.log(this.fooModifiers); // { capitalize: true }
+  }
+  <input type="text" :value="foo" @input="$emit('update:foo', $event.target.value)" />
+
+
+```
+
+
+
+1. $parent,$children 获取当前组件的父组件和当前组件的子组件
+2. $attrs 和$listeners A->B->C。Vue 2.4 开始提供了$attrs 和$listeners 来解决这个问题 (跨级)
+3. 父组件中通过 provide 来提供变量，然后在子组件中通过 inject 来注入变量。(官方不推荐在实际业务中使用，但是写组件库时很常用) (跨级)
+4. $refs 获取组件实例
+5. envetBus 兄弟组件数据传递 这种情况下可以使用事件总线的方式， 这种方法通过**一个空的 Vue实例作为中央事件总线（事件中心**），用它来触发事件和监听事件，从而实现任何组件间的通信，包括父子、隔代、兄弟组件
+6. vuex 状态管理 (跨级)
 
 #### 4 Vue 的生命周期方法有哪些 一般在哪一步发请求
 
@@ -1290,7 +1361,7 @@ window.addEventListener("hashchange", funcRef, false);
 
 
 
-# Vue3.0 最常出现的面试题
+# Vue3.0 
 
 ## Vue 3.0 性能提升主要是通过哪几方面体现的？
 
@@ -1500,6 +1571,8 @@ patch flag, 在动态标签末尾加上相应的标记,只能带 patchFlag 的�
 
   - 在vue中的template中使用ref的值不用通过value获取
   - 在js中使用ref的值必须通过value获取
+  
+  ref:num=100  num=200 无需.value
 
 #### get
 
@@ -1897,5 +1970,408 @@ function changeRef() {
     state.value = 345
 }
 
+```
+
+
+
+
+
+# React
+
+## 你的技术栈主要是react，那你说说你⽤react有什么坑点？
+1、JSX做表达式判断时候，需要强转为boolean类型，如：
+
+```javascript
+render() {
+  const b = 0;
+  return <div>
+    {
+      !!b && <div>这是⼀段⽂本</div>
+    } 
+  </div>
+}
+```
+
+如果不使⽤ !!b 进⾏强转数据类型，会在⻚⾯⾥⾯输出 0。
+2、尽量不要在 componentWillReviceProps ⾥使⽤ setState，如果⼀定要使⽤，那么需要判断结束条 件，不然会出现⽆限重渲染，导致⻚⾯崩溃。(实际不是componentWillReviceProps会⽆限重渲染，⽽ 是componentDidUpdate)
+3、给组件添加ref时候，尽量不要使⽤匿名函数，因为当组件更新的时候，匿名函数会被当做新的prop 处理，让ref属性接受到新函数的时候，react内部会先清空ref，也就是会以null为回调参数先执⾏⼀次 ref这个props，然后在以该组件的实例执⾏⼀次ref，所以⽤匿名函数做ref的时候，有的时候去ref赋值 后的属性会取到null
+4、遍历⼦节点的时候，不要⽤ index 作为组件的 key 进⾏传⼊。
+
+
+
+## 怎么去设计⼀个组件封装
+- 组件封装的⽬的是为了重⽤，提⾼开发效率和代码质量 
+- 低耦合，单⼀职责，可复⽤性，可维护性
+
+## react 的虚拟dom是怎么实现的
+
+⾸先说说为什么要使⽤Virturl DOM，因为操作真实DOM的耗费的性能代价太⾼，所以react内部使⽤js 实现了⼀套dom结构，在每次操作在和真实dom之前，使⽤实现好的diﬀ算法，对虚拟dom进⾏⽐较， 递归找出有变化的dom节点，然后对其进⾏更新操作。为了实现虚拟DOM，我们需要把每⼀种节点类 型抽象成对象，每⼀种节点类型有⾃⼰的属性，也就是prop，每次进⾏diﬀ的时候，react会先⽐较该节
+点类型，假如节点类型不⼀样，那么react会直接删除该节点，然后直接创建新的节点插⼊到其中，假如 节点类型⼀样，那么会⽐较prop是否有更新，假如有prop不⼀样，那么react会判定该节点有更新，那 么重渲染该节点，然后在对其⼦节点进⾏⽐较，⼀层⼀层往下，直到没有⼦节点。
+
+## react hooks 原理是什么？
+
+hooks 是⽤闭包实现的，因为纯函数不能记住状态，只能通过闭包来实现。
+
+## useState 中的状态是怎么存储的？
+
+通过单向链表，ﬁber tree 就是⼀个单向链表的树形结构。
+
+## 如何遍历⼀个dom树
+
+```javascript
+function traversal(node) { 
+    //对node的处理
+    if (node && node.nodeType === 1) { 
+        console.log(node.tagName);
+    }
+    var i = 0,
+        childNodes = node.childNodes, 
+        item;
+    for (; i < childNodes.length; i++) { 
+        item = childNodes[i];
+        if (item.nodeType === 1) { 
+            //递归先序遍历⼦节点
+            traversal(item); 
+        }
+    }
+}
+```
+
+## 数据双向绑定单向绑定优缺点
+
+双向绑定是⾃动管理状态的，对处理有⽤户交互的场景⾮常合适，代码量少，当项⽬越来越⼤的时 候，调试也变得越来越复杂，难以跟踪问题
+单向绑定是⽆状态的, 程序调试相对容易, 可以避免程序复杂度上升时产⽣的各种问题, 当然写代码 时就没有双向绑定那么爽了
+
+## React ﬁber 的理解和原理
+理解 
+React16 以前
+React16 以前，对virtural dom的更新和渲染是同步的。就是当⼀次更新或者⼀次加载开始以后，diﬀ virtual dom并且渲染的过程是⼀⼝⽓完成的。如果组件层级⽐较深，相应的堆栈也会很深，⻓时间占⽤ 浏览器主线程，⼀些类似⽤户输⼊、⿏标滚动等操作得不到响应。借Lin的两张图，视频 A Cartoon Intro to Fiber - React Conf 2017。
+
+React16 Fiber Reconciler
+React16 ⽤了分⽚的⽅式解决上⾯的问题。 
+就是把⼀个任务分成很多⼩⽚，当分配给这个⼩⽚的时间⽤尽的时候，就检查任务列表中有没有新的、 优先级更⾼的任务，有就做这个新任务，没有就继续做原来的任务。这种⽅式被叫做异步渲染(Async Rendering)。
+
+⼀些原理 
+Fiber就是通过对象记录组件上需要做或者已经完成的更新，⼀个组件可以对应多个Fiber。
+在render函数中创建的React Element树在第⼀次渲染的时候会创建⼀颗结构⼀模⼀样的Fiber节点树。 不同的React Element类型对应不同的Fiber节点类型。⼀个React Element的⼯作就由它对应的Fiber节 点来负责。
+⼀个React Element可以对应不⽌⼀个Fiber，因为Fiber在update的时候，会从原来的Fiber（我们称为 current）clone出⼀个新的Fiber（我们称为alternate）。两个Fiber diﬀ出的变化（side eﬀect）记录 在alternate上。所以⼀个组件在更新时最多会有两个Fiber与其对应，在更新结束后alternate会取代之 前的current的成为新的current节点。
+其次，Fiber的基本规则：
+更新任务分成两个阶段，Reconciliation Phase和Commit Phase。Reconciliation Phase的任务⼲的事 情是，找出要做的更新⼯作（Diﬀ Fiber Tree），就是⼀个计算阶段，计算结果可以被缓存，也就可以 被打断；Commmit Phase 需要提交所有更新并渲染，为了防⽌⻚⾯抖动，被设置为不能被打断。
+PS: componentWillMount componentWillReceiveProps componentWillUpdate ⼏个⽣命周期⽅法， 在Reconciliation Phase被调⽤，有被打断的可能（时间⽤尽等情况），所以可能被多次调⽤。其实 shouldComponentUpdate 也可能被多次调⽤，只是它只返回true或者false，没有副作⽤，可以暂时 忽略。
+
+## 解释 React 中 render() 的⽬的
+
+每个React组件强制要求必须有⼀个 render()。它返回⼀个 React 元素，是原⽣ DOM 组件的表示。如 果需要渲染多个 HTML 元素，则必须将它们组合在⼀个封闭标记内，例如 、 、`` 等。此函数必须保持 纯净，即必须每次调⽤时都返回相同的结果。
+
+## 调⽤ setState 之后发⽣了什么？
+
+- 在代码中调⽤ setState 函数之后，React 会将传⼊的参数对象与组件当前的状态合并，然后触发 所谓的调和过程。 
+- 经过调和过程，React会以相对⾼效的⽅式根据新的状态构建React元素树并且着⼿重新渲染整个 UI 界⾯。
+- 在 React 得到元素树之后，React 会⾃动计算出新的树与⽼树的节点差异，然后根据差异对界⾯进 ⾏最⼩化重渲染。
+- 在差异计算算法中，React 能够相对精确地知道哪些位置发⽣了改变以及应该如何改变，这就保证 了按需更新，⽽不是全部重新渲染。
+
+## 触发多次setstate，那么render会执⾏⼏次？
+- 多次setState会合并为⼀次render，因为setState并不会⽴即改变state的值，⽽是将其放到⼀个任 务队列⾥，最终将多个setState合并，⼀次性更新⻚⾯。 
+- 所以我们可以在代码⾥多次调⽤setState，每次只需要关注当前修改的字段即可
+
+## react中如何对state中的数据进⾏修改？setState为什么是⼀个异步的？
+- 修改数据通过this.setState(参数1,参数2) 
+- this.setState是⼀个异步函数
+  - 参数1 : 是需要修改的数据是⼀个对象
+  - 参数2 : 是⼀个回调函数，可以⽤来验证数据是否修改成功，同时可以获取到数据更新后的 DOM结构等同于componentDidMount
+
+- this.setState中的第⼀个参数除了可以写成⼀个对象以外，还可以写成⼀个函数  ！，函数中第⼀ 个值为prevState 第⼆个值为prePprops     this.setState((prevState,prop)=>({}))
+
+## 为什么建议传递给 setState的参数是⼀个callback⽽不是⼀个对象？
+因为this.props 和this.state的更新可能是异步的，不能依赖它们的值去计算下⼀个state
+## 为什么setState是⼀个异步的？ 
+当批量执⾏state的时候可以让DOM渲染的更快,也就是说多个setstate在执⾏的过程中还需要被合
+并
+
+## 原⽣事件和React事件的区别？
+
+- React  事件使⽤驼峰命名，⽽不是全部⼩写。
+- 通过 JSX  , 你传递⼀个函数作为事件处理程序，⽽不是⼀个字符串。
+- 在 React  中你不能通过返回 false  来阻⽌默认⾏为。必须明确调⽤ preventDefault 。
+
+## React的合成事件是什么？
+React  根据 W3C  规范定义了每个事件处理函数的参数，即合成事件。
+
+事件处理程序将传递 SyntheticEvent  的实例，这是⼀个跨浏览器原⽣事件包装器。它具有与浏览器 原⽣事件相同的接⼝，包括 stopPropagation()  和 preventDefault() ，在所有浏览器中他们⼯作 ⽅式都相同。
+
+React 合成的 SyntheticEvent 采⽤了事件池，这样做可以⼤⼤节省内存，⽽不会频繁的创建和销毁 事件对象。
+
+
+另外，不管在什么浏览器环境下，浏览器会将该事件类型统⼀创建为合成事件，从⽽达到了浏览器兼容 的⽬的。
+## 什么是⾼阶组件（HOC）
+⾼阶组件是重⽤组件逻辑的⾼级⽅法，是⼀种源于 React 的组件模式。 HOC 是⾃定义组件，在它之内 包含另⼀个组件。它们可以接受⼦组件提供的任何动态，但不会修改或复制其输⼊组件中的任何⾏为。 你可以认为 HOC 是“纯（Pure）”组件。
+
+## 你能⽤HOC做什么？
+
+HOC可⽤于许多任务，例如：
+
+- 代码重⽤，逻辑和引导抽象 
+- 渲染劫持
+- 状态抽象和控制
+- Props 控制
+
+## 你知道的react的生命周期
+
+初始化
+
+- componentWillMount 初始化调用，只调用一次
+  render 渲染页面
+- componentDidMount 第一次渲染后调用
+
+更新
+
+- componentWillReceireProps 接收新的props时调用
+- shouldComponentUpdate state或props改变时调用
+- componentWillUpdate 将要更新时调用，可改变state的值
+  render
+- componentDidUpdate 更新后调用
+
+卸载
+
+- componentWillUnMount
+
+## react声明默认props
+
+设置默认props有两种方式
+
+- 指定 props 的默认值， 这个方法只有浏览器编译以后 才会生效
+
+```
+static defaultProps = { 
+  age: 18
+}
+复制代码
+```
+
+- 指定 props 的默认值，这个方法会一直生效
+
+```
+  Greeting.defaultProps = {    
+    name: '我是props的默认值！'
+  }
+```
+
+## react创建组件的三种方式
+
+1.函数式定义的无状态组件，适用于纯展示组件，只负责根据传入的props展示，不涉及state状态的操作，特点如下
+
+- 组件不会被实例化，整体渲染性能得到提升。
+- 组件不能访问this对象
+- 组件无法访问生命周期的方法
+- 无状态组件只能访问输入的props，同样的props会得到同样的渲染结果，不会有副作用
+
+```
+function  MyTest1() {
+  return <h1>工厂(无状态)函数(最简洁, 推荐使用)</h1>
+}
+```
+
+2.es5原生方式React.createClass定义有状态的组件
+
+- 组件会被实例化
+- 可以访问生命周期
+- 会自绑定函数方法
+
+```
+var MyTest2=React.createClass({
+  render(){
+   return <h1>ES5老语法(不推荐使用了)</h1>
+  }
+})
+复制代码
+```
+
+3.es6形式的extends React.Component定义的组件，是以ES6的形式来创建react的组件的，是React目前极为推荐的创建有状态组件的方式
+
+```
+class  MyTest3 extends React.Component{
+  render(){
+     return <h1>ES6类语法(复杂组件, 推荐使用)</h1>
+  }
+}
+```
+
+React.createClass与React.Component区别
+
+- this绑定不同
+  React.createClass创建的组件，其每一个成员函数的this都有React自动绑定，任何时候使用，直接使用this.method即可，函数中的this会被正确设置。
+  React.Component创建的组件，其成员函数不会自动绑定this，需要开发者手动绑定，否则this不能获取当前组件实例对象。
+- 组件属性类型propTypes及其默认props属性defaultProps配置不同
+- 组件初始状态state的配置不同
+- Mixins的支持不同
+
+
+
+#  Webpack
+
+## 有哪些常见的loader和plugin，你用过哪些
+
+```
+loader
+
+file-loader：把文件输出到一个文件夹中，在代码中通过相对 URL 去引用输出的文件
+url-loader：和 file-loader 类似，但是能在文件很小的情况下以 base64 的方式把文件内容注入到代码中去
+source-map-loader：加载额外的 Source Map 文件，以方便断点调试
+image-loader：加载并且压缩图片文件
+babel-loader：把 ES6 转换成 ES5
+css-loader：加载 CSS，支持模块化、压缩、文件导入等特性
+style-loader：把 CSS 代码注入到 JavaScript 中，通过 DOM 操作去加载 CSS。
+eslint-loader：通过 ESLint 检查 JavaScript 代码
+
+plugin
+
+define-plugin：定义环境变量
+commons-chunk-plugin：提取公共代码
+uglifyjs-webpack-plugin：通过UglifyES压缩ES6代码
+
+复制代码
+```
+
+## loader 和 plugin 的区别是什么？
+
+```
+不同的作用：
+Loader直译为"加载器"。
+    Webpack将一切文件视为模块，但是webpack原生是只能解析js文件，如果想将其他文件也打包的话，就会用到loader。 所以Loader的作用是让webpack拥有了加载和解析非JavaScript文件的能力。
+Plugin直译为"插件"。
+    Plugin可以扩展webpack的功能，让webpack具有更多的灵活性。 在 Webpack 运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
+
+不同的用法：
+Loader在module.rules中配置，也就是说他作为模块的解析规则而存在。类型为数组，每一项都是一个Object，里面描述了对于什么类型的文件（test），使用什么加载(loader)和使用的参数（options）。
+Plugin在plugins中单独配置，类型为数组，每一项是一个plugin的实例，参数都通过构造函数传入。
+复制代码
+```
+
+##  如何按需加载代码？
+
+```
+Vue UI组件库的按需加载 为了快速开发前端项目，经常会引入现成的UI组件库如ElementUI、iView等，但是他们的体积和他们所提供的功能一样，是很庞大的。 
+而通常情况下，我们仅仅需要少量的几个组件就足够了，但是我们却将庞大的组件库打包到我们的源码中，造成了不必要的开销。
+
+不过很多组件库已经提供了现成的解决方案，如Element出品的babel-plugin-component和AntDesign出品的babel-plugin-import 安装以上插件后，
+在.babelrc配置中或babel-loader的参数中进行设置，即可实现组件按需加载了。
+
+{
+  "presets": [["es2015", { "modules": false }]],
+  "plugins": [
+    [
+      "component",
+      {
+        "libraryName": "element-ui",
+        "styleLibraryName": "theme-chalk"
+      }
+    ]
+  ]
+}
+单页应用的按需加载 现在很多前端项目都是通过单页应用的方式开发的，但是随着业务的不断扩展，会面临一个严峻的问题——首次加载的代码量会越来越多，影响用户的体验。
+
+通过import(*)语句来控制加载时机，webpack内置了对于import(*)的解析，会将import(*)中引入的模块作为一个新的入口在生成一个chunk。 
+当代码执行到import(*)语句时，会去加载Chunk对应生成的文件。import()会返回一个Promise对象，所以为了让浏览器支持，需要事先注入Promise polyfill
+复制代码
+```
+
+##  如何提高webpack的构建速度
+
+```
+1.多入口情况下，使用CommonsChunkPlugin来提取公共代码
+2.通过externals配置来提取常用库
+3.利用DllPlugin和DllReferencePlugin预编译资源模块 4.通过DllPlugin来对那些我们引用但是绝对不会修改的npm包来进行预编译，再通过DllReferencePlugin将预编译的模块加载进来。
+5.使用Happypack 实现多线程加速编译
+6.使用webpack-uglify-parallel来提升uglifyPlugin的压缩速度。 7.原理上webpack-uglify-parallel采用了多核并行压缩来提升压缩速度
+8.使用Tree-shaking和Scope Hoisting来剔除多余代码
+复制代码
+```
+
+##  怎么配置单页应用？怎么配置多页应用？
+
+```
+单页应用可以理解为webpack的标准模式，直接在entry中指定单页应用的入口即可，这里不再赘述
+
+多页应用的话，可以使用webpack的 AutoWebPlugin来完成简单自动化的构建，但是前提是项目的目录结构必须遵守他预设的规范。 
+
+多页应用中要注意的是：
+每个页面都有公共的代码，可以将这些代码抽离出来，避免重复的加载。比如，每个页面都引用了同一套css样式表
+随着业务的不断扩展，页面可能会不断的追加，所以一定要让入口的配置足够灵活，避免每次添加新页面还需要修改构建配置
+复制代码
+```
+
+##  webpack的proxy是如何解决跨域的？
+
+```
+webpack的dev-serve模块会启动一个服务器，这个服务器不止帮我们做了自动更新，同时也可以做到反向代理。
+
+就是我们把请求发送给webpack-dev-serve，然后webpack-dev-serve再去请求后端服务器，服务器之间的请求是没有跨域问题的。
+
+只要后端返回了，webpack-dev-serve就能拿到，然后再返回给前端。
+复制代码
+```
+
+## 性能优化
+
+###  前端性能优化
+
+```
+三个方面来说明前端性能优化
+
+一： webapck优化与开启gzip压缩
+    1.babel-loader用 include 或 exclude 来帮我们避免不必要的转译，不转译node_moudules中的js文件
+    其次在缓存当前转译的js文件，设置loader: 'babel-loader?cacheDirectory=true'
+    2.文件采用按需加载等等
+    3.具体的做法非常简单，只需要你在你的 request headers 中加上这么一句：accept-encoding:gzip
+    4.图片优化，采用svg图片或者字体图标
+    5.浏览器缓存机制，它又分为强缓存和协商缓存
+二：本地存储——从 Cookie 到 Web Storage、IndexedDB
+    说明一下SessionStorage和localStorage还有cookie的区别和优缺点
+三：代码优化
+    1.事件代理
+    2.事件的节流和防抖
+    3.页面的回流和重绘
+    4.EventLoop事件循环机制
+    5.代码优化等等
+复制代码
+```
+
+## 工具类
+
+#### 1.npm与yarn的区别
+
+```
+Yarn文档中有说，Yarn 是为了弥补 npm 的一些缺陷而出现的
+
+yarn 的速度更快；安装版本会更统一；更简洁的输出（配合emoji表情）；更好的语义化，比如yarn add/remove 替代 npm install/uninstall
+复制代码
+```
+
+## 主观题
+
+#### 1.说说你经常遇到的问题
+
+```
+经常遇到的问题就是Cannot read property ‘prototype’ of undefined
+解决办法通过浏览器报错提示代码定位问题，解决问题
+
+Vue项目中遇到视图不更新，方法不执行，埋点不触发等问题
+一般解决方案查看浏览器报错，查看代码运行到那个阶段未之行结束，阅读源码以及相关文档等
+然后举出来最近开发的项目中遇到的算是两个比较大的问题。
+复制代码
+```
+
+#### 2.说说你对前端工程化的理解
+
+```
+我个人理解主要是从模块化、组件化、规范化、自动化这四个方面来实现前端工程化的：
+1.模块化：
+    简单来说，模块化就是将一个大文件拆分成相互依赖的小文件，再进行统一的拼装和加载。
+2.组件化：
+    组件化有点类似模块化，但模块化主要是在文件层面上的，而组件化则是在平时写代码的时候就有封装组件的意识，让组件能够多次复用
+3.规范化：
+    比如目录结构的制定、代码的规范、接口的规范、命名的规范等，遵循一套规范可以让代码更容易维护，出问题的时候也方便快速定位
+4.自动化：
+    任何简单机械的重复劳动都应该让机器去完成，比如自动化测试、自动化部署等
 ```
 

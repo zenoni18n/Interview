@@ -1,6 +1,6 @@
 抓紧面试前的宝贵时间，快速搞定前端JS面试
 
-## 基础
+##  基础
 
 1. 前端两个标准 W3C标准 html css dom bom 等应用标准和ECMA262标准 es6 原型闭包等语法标准
 
@@ -62,7 +62,6 @@
 
    相当于 0 == 0 自然就返回 true了
    
-
 7. && 、 ||和!! 运算符分别能做什么
 
    - `&&` 叫逻辑与，在其操作数中找到第一个虚值表达式并返回它，如果没有找到任何虚值表达式，则返回最后一个真值表达式。它采用短路来防止不必要的工作。
@@ -1231,154 +1230,10 @@ Cookie、localStorage、sessionStorage三者的区别
   将堆栈中的内容应用到当前目录，不同于git stash pop，该命令不会将内容从堆栈中删除，也就说该命令能够将堆栈的内容多次应用到工作目录中，适应于多个分支的情况。
   git push -u origin master 上面命令将本地的master分支推送到origin主机，同时指定origin为默认主机，后面就可以不加任何参数使用git push了。
 
-### 调试工具
-
 ### 抓包
 
 移动端的h5页面查看网络请求的时候，需要用工具抓包
 windows一般用fiddler，Mac OS一般用charles，我个人是用的charles (windows)
-
-### webpack babel
-
-1. webpack搭建环境(开发)
-   (1)npm init -y
-
--y 的含义：yes的意思，在init的时候省去了敲回车的步骤，生成的默认的package.json
-(2)cnpm install webpack webpack-cli -D
-(3)在这里目webpack-demo目录下创建src目录
-(4)接着在src里面新建index.js //console.log(“this is index js”)
-(5)然后在webpack-demo目录新建webpack.config.js，这就是webpack默认的配置文件的名字
-在webpack.config.js内容如下：
-
-```
-const path = require('path')
-module.exports = {
-    mode: 'development', // production
-    entry: path.join(__dirname, 'src', 'index.js'),//__dirname就是当前目录(同一套代码不同环境可能当前环境路径字符串不一样,__dirname能统一表示)
-    //拼接src再拼接index.js，就能找到整个文件的入口
-    output: {
-        filename: 'bundle.js',
-        path: path.join(__dirname, 'dist')
-    }
-}
-```
-
-(6)接着准备运行了，我们来到package.json，在scripts里面加上”build”: “webpack”，
-webpack打包的时候默认配置文件是webpack.config.js，所以不用指定webpack –config webpack.config.js，除非配置文件是其它名字
-(7)接着我们执行命令，npm run build，我们指定了build为webpack，所以等同于你执行npm run webpack
-(8)在src下面新建index.html
-(9)接着还得安装一个解析html的插件html-webpack-plugin
-cnpm install html-webpack-plugin -D
-(10)继续安装一个能启动服务的插件webpack-dev-server
-cnpm install webpack-dev-server -D
-(11)接下来要去webpack.config.js去加上插件和开启本地服务的配置
-(12)然后在package.json的scripts里面加上一句”dev”: “webpack-dev-server”
-(13)然后命令行执行npm run dev 执行之后看到服务器开起来了，端口3000 ，运行结果如下，就是index.html的内容
-\5. webpack-babel
-将ES6转换成ES5语法，因为有的浏览器太落后，ES6语法无法识别
-babel就是js的高级语法向低级语法转变的工具，babel可以提供插件给webpack用
-(1)执行命令cnpm i @babel/core @babel/preset-env babel-loader
-i就是install的简写，@就是组，@babel/core表示安装babel组里面的core模块，env是babel的配置插件集合，babel-loader就是给webpack用的一个插件
-(2)接着在webpack-demo目录下新建.babelrc文件（和webpack.config.js在同一目录）
-
-```
-{
-    "presets": [
-        "@babel/preset-env"
-    ]
-}
-```
-
-(3)接着修改webpack.config.js，主要是加上module模块
-(4)module模块就是针对不同模块做不同的解析
-\6. webpack-ES6-Module（ES6的模块化）
-用模块化就是想用一个导出导入的过程
-export和export default的区别
-(1)export命令用于规定模块的对外接口
-一个模块就是一个独立的文件。该文件内部的所有变量，外部无法获取。如果你希望外部能够读取模块内部的某个变量，就必须使用export关键字输出该变量。下面是一个 JS 文件，里面使用export命令输出变量。
-
-```
-// profile.js
-export var firstName = 'Michael';
-export var lastName = 'Jackson';
-export var year = 1958;
-```
-
-上面代码是profile.js文件，保存了用户信息。ES6 将其视为一个模块，里面用export命令对外部输出了三个变量。
-export的写法，除了像上面这样，还有另外一种。
-
-```
-// profile.js
-var firstName = 'Michael';
-var lastName = 'Jackson';
-var year = 1958;
-export {firstName, lastName, year};
-```
-
-上面代码在export命令后面，使用大括号指定所要输出的一组变量。它与前一种写法（直接放置在var语句前）是等价的，但是应该优先考虑使用这种写法。因为这样就可以在脚本尾部，一眼看清楚输出了哪些变量。
-export命令除了输出变量，还可以输出函数或类（class）。
-
-```
-export function multiply(x, y) {
-  return x * y;
-};
-```
-
-上面代码对外输出一个函数multiply。
-export命令对外输出了指定名字的变量（变量也可以是函数或类）。
-与export default命令的区别：import命令接受一对大括号，里面指定要从其他模块导入的变量名。大括号里面的变量名，必须与被导入模块（profile.js）对外接口的名称相同。
-如果想为输入的变量重新取一个名字，import命令要使用as关键字，将输入的变量重命名。
-`import { lastName as surname } from './profile.js';`
-export default命令，为模块指定默认输出。
-使用import命令的时候，用户需要知道所要加载的变量名或函数名，否则无法加载。但是，用户肯定希望快速上手，未必愿意阅读文档，去了解模块有哪些属性和方法。
-为了给用户提供方便，让他们不用阅读文档就能加载模块，就要用到export default命令，为模块指定默认输出。
-
-```
-// export-default.js
-export default function () {
-  console.log('foo');
-}
-```
-
-上面代码是一个模块文件export-default.js，它的默认输出是一个函数。
-与export命令的区别：其他模块加载该模块时，import命令可以为该匿名函数指定任意名字。
-
-```
-// import-default.js
-import customName from './export-default';
-customName(); // 'foo'
-```
-
-上面代码的import命令，可以用任意名称指向export-default.js输出的方法，这时就不需要知道原模块输出的函数名。需要注意的是，这时import命令后面，不使用大括号。
-本质上，export default就是输出一个叫做default的变量或方法，然后系统允许你为它取任意名字。所以，下面的写法是有效的。
-
-```
-// modules.js
-function add(x, y) {
-  return x * y;
-}
-export {add as default};
-// 等同于
-// export default add;
-
-// app.js
-import { default as foo } from 'modules';
-// 等同于
-// import foo from 'modules';
-```
-
-正是因为export default命令其实只是输出一个叫做default的变量，所以它后面不能跟变量声明语句。
-总结：export命令对外接口是有名称的且import命令从模块导入的变量名与被导入模块对外接口的名称相同，而export default命令对外输出的变量名可以是任意的，这时import命令后面，不使用大括号。
-export default命令用于指定模块的默认输出。显然，一个模块只能有一个默认输出，因此export default命令只能使用一次。所以，import命令后面才不用加大括号，因为只可能唯一对应export default命令。
-
-7.webpack-配置生产环境
-现在的webpack.config.js是开发环境的webpack配置，但是不能直接上线，体积又大运行又慢，接下来我们来看看怎么配置一个生产环境的打包
-(1)我们在当前目录新建一个生产环境的配置文件webpack.prod.js，prod就是production的简写
-(2)接着我们需要去package.json去修改”build”，因为”build”的value还是”webpack”，默认运行的开发环境配置webpack.config.js，它会去启动我们写的服务devServer，那我们怎么办呢？
-来改一改package.json，我们上面讲了，”build” : “webpack”就是”build” : “webpack –config webpack.config.js”，而现在我们需要指定生产环境的配置，所以需要变成”build” : “webpack –config webpack.prod.js”
-(3)接着再次执行npm run build，现在运行的就是生产环境的配置webpack.prod.js了
-(4)bundle.hash值.js，即配置的[contenthash]的结果，主要是命中缓存，进行性能优化
-我们可以看到bundle.hash值.js的内容都是经过压缩的，压缩后的代码体积又小运行又快，下载也快，所以生产环境必须单独配置。
 
 ### linux
 
@@ -1780,13 +1635,48 @@ m： multiple lines多行搜索
 
    如果在渲染的时候遇到img标签链接的图片还没下载完也会继续渲染，会把这个位置空出来，等到图片下载完成插入就行，图片的大小未指定可能引起reflow，比如图片过大把旁边内容撑下去了，所以最好图片设置宽和高来避免重新渲染
 
-## 性能优化
+## 错误监控
 
-![image-20200521132056704](C:\Users\Zenon\AppData\Roaming\Typora\typora-user-images\image-20200521132056704.png)
+**即时运行错误**:代码错误
+
+捕获方式: try catch     window.onerror
+
+**资源加载错误**
+
+捕获方式:1、object.onerror  2、performance.getEntries()  3、Error事件捕获
+
+performance.getEntries() .forEach(item=>console.log(item))请求出全部资源，然后可以配合getTagName(‘image)去比对哪个资源错误
+
+Error事件捕获:window.addEventListener('error',(e)=>{},true)开启捕获
+
+上报错误的基本原理：采用Ajax通信的方式上报、利用Image对象上报(new Image()).src='上报地址'
+
+## 性能优化
 
 1. **让加载更快**
    **(1)减少资源体积：压缩代码**
    **(2)减少访问次数：合并代码(几个js合并成一个js)，SSR服务器端渲染，缓存**
+
+缓存分类:强缓存和协商缓存
+
+   1.强缓存(不用问，不用和服务器通信，直接磁盘里拿缓存给页面用,如果服务器都下发两个，以后者为准):
+
+   Expires 绝对时间，但有缺陷，客户端时间与服务器时间不一致
+
+   Cache-Control (与客户端相对时间): Cache-Control:max-age=3600 3600时间内都会拿缓存
+
+   
+
+   2.协商缓存(问服务器):
+
+   Last-Modified （从服务器拿文件，浏览器给http请求头加时间）
+
+   If-Modified-Since(当强缓存失效了，就请求携带If-Modified-Since并带上Last-Modified 去询问服务器是否发生变化;优缺点：修改时间变了，但是内容没有变化，所以就有了Etag)
+
+   Etag(有哈希)
+
+   If-None-Match
+
    **(3)使用更快网络:CDN**
 
 2. **让渲染更快**
@@ -1822,8 +1712,10 @@ m： multiple lines多行搜索
 
    ![image-20200521173806407](C:\Users\Zenon\AppData\Roaming\Typora\typora-user-images\image-20200521173806407.png)
 
-   ### 手写防抖debounce
    
+
+   ### 手写防抖debounce
+
    ```
    const input1 = document.getElementById('input1')
    // let timer = null
@@ -1861,9 +1753,9 @@ m： multiple lines多行搜索
        console.log(input1.value)
    }, 600))
    ```
-   
+
    ### 手写节流throttle  drag拖拽
-   
+
    ```
    const div1 = document.getElementById('div1')
    
@@ -1903,19 +1795,19 @@ m： multiple lines多行搜索
    })
    
    ```
-   
+
    **防抖**
-   
+
    > 触发高频事件后n秒内函数只会执行一次，如果n秒内高频事件再次被触发，则重新计算时间
    >
    > 当你持续触发事件后，一定时间内没有再触发事件，事件处理函数才会处理一次
    >
    > 场景：input 搜索框
-   
+
    - 思路：
-   
+
    > 每次触发事件时都取消之前的延时调用方法
-   
+
    ```js
    function debounce(fn) {
          let timeout = null; // 创建一个标记用来存放定时器的返回值
@@ -1933,19 +1825,19 @@ m： multiple lines多行搜索
        var inp = document.getElementById('inp');
        inp.addEventListener('input', debounce(sayHi)); // 防抖
    ```
-   
+
    **节流**
-   
+
    > 高频事件触发，但在n秒内只会执行一次，所以节流会稀释函数的执行频率
    >
    > 点点点，每隔一秒执行一次
    >
    > 场景：resize（改变窗口大小） scroll
-   
+
    - 思路：
-   
+
    > 每次触发事件时都判断当前是否有等待执行的延时函数
-   
+
    ```text
    function throttle(fn) {
          let canRun = true; // 通过闭包保存一个标记
@@ -1964,7 +1856,7 @@ m： multiple lines多行搜索
        }
        window.addEventListener('resize', throttle(sayHi));
    ```
-   
+
 3. **https不是一个新的协议，它只是http协议身披一层SSL(Secure Socket Layer，安全套阶 层)协议,HTTPS比HTTP更加安全，对搜索引擎更友好，利于SEO,谷歌、百度优先索引HTTPS网页;**
    **HTTPS需要用到SSL证书，而HTTP不用;**
 
@@ -2004,9 +1896,13 @@ m： multiple lines多行搜索
    (2)跨站请求伪造（英语：Cross-site request forgery），也被称为 one-click attack 或者 session riding，通常缩写为 CSRF 或者 XSRF， 是一种挟制用户在当前已登录的 Web 应用程序上执行非本意的操作的攻击方法。如:攻击者诱导受害者进入第三方网站，在第三方网站中，向被攻击网站发送跨站请求。利用受害者在被攻击网站已经获取的注册凭证，绕过后台的用户验证，达到冒充用户对被攻击的网站执行某项操作的目的。
    “cookie本身就保存在浏览器端 到了时间才失效 你不用其他或者手动去清除 没到时间cookie不会失效 只有session 才会失效”
 
-   
+   **CSRF**:跨站请求伪造(Cross-site request forgery)
 
+   原理：在你登录的情况下，把带有漏洞接口的页面给用户点击，点击后就会发送请求(新浪微博添加粉丝关注，导致多了很多粉丝和用户)
 
+   防御措施：Token验证 Referer验证(页面来源)  隐藏令牌(隐藏在http中，不会放在链接中)
+
+   **XSS**：跨域脚本攻击(cross-site scripting)
 
 ## 面试
 
@@ -3013,6 +2909,8 @@ call和apply之间的差别在于参数的区别，call和apply的第一个参�
 
 ## JavaScript垃圾回收机制
 
+js的内存是自动进行分配和回收的,内存在不使用的时候会被垃圾回收器自动进行回收,但是我们需要了解垃圾回收的机制,从而防止内存泄漏(内存无法被回收)
+
 ### 标记清除
 
 当变量进入JS执行栈环境标记为 ‘进入环境’ ，标记为’进入环境’的变量不可被回收
@@ -3021,11 +2919,13 @@ call和apply之间的差别在于参数的区别，call和apply的第一个参�
 
 当变量从JS执行栈出栈，离开环境时，则标记为’离开环境’，离开环境的变量可以被回收
 
-### 引用清除
+### 引用计数垃圾回收
+
+a对象对b对象有访问权限,那么成为a引用b对象
 
 堆对象被变量引用的次数为0时，回收其占用的内存空间
 
-引用清除存在循环引用的问题
+缺陷:引用清除存在**循环引用**的问题
 
 ```
 const A = {}
@@ -3050,6 +2950,10 @@ IE9把DOM和BOM转换成真正的JS对象了，所以避免了这个问题。
 5.继续下一轮的宏任务和微任务
 
 垃圾回收机制：
+生命周期:
+内存分配:声明变量，函数，对象的时候。js回自动分配内存
+内存使用：调用的时候，使用的时候
+内存回收
 方法一：标记清除（比较常见）
 1.当变量进入执行环境时，就标记这个变量为“进入环境”。
 //从逻辑上讲，永远不能释放进入环境的变量所占用的内存，因为只要执行流进入相应的环境，就可能会用到他们。
@@ -3065,6 +2969,45 @@ IE9把DOM和BOM转换成真正的JS对象了，所以避免了这个问题。
 4.这样，垃圾收集器下次再运行时，它就会释放那些引用次数为0的值所占的内存。
 ```
 
+### 简单介绍一下 V8 引擎的垃圾回收机制
+
+```
+v8 的垃圾回收机制基于分代回收机制，这个机制又基于世代假说，这个假说有两个特点，一是新生的对象容易早死，另一个是不死的对象会活得更久。基于这个假说，v8 引擎将内存分为了新生代和老生代。
+
+新创建的对象或者只经历过一次的垃圾回收的对象被称为新生代。经历过多次垃圾回收的对象被称为老生代。
+
+新生代被分为 From 和 To 两个空间，To 一般是闲置的。当 From 空间满了的时候会执行 Scavenge 算法进行垃圾回收。当我们执行垃圾回收算法的时候应用逻辑将会停止，等垃圾回收结束后再继续执行。这个算法分为三步：
+
+（1）首先检查 From 空间的存活对象，如果对象存活则判断对象是否满足晋升到老生代的条件，如果满足条件则晋升到老生代。如果不满足条件则移动 To 空间。
+
+（2）如果对象不存活，则释放对象的空间。
+
+（3）最后将 From 空间和 To 空间角色进行交换。
+
+新生代对象晋升到老生代有两个条件：
+
+（1）第一个是判断是对象否已经经过一次 Scavenge 回收。若经历过，则将对象从 From 空间复制到老生代中；若没有经历，则复制到 To 空间。
+
+（2）第二个是 To 空间的内存使用占比是否超过限制。当对象从 From 空间复制到 To 空间时，若 To 空间使用超过 25%，则对象直接晋升到老生代中。设置 25% 的原因主要是因为算法结束后，两个空间结束后会交换位置，如果 To 空间的内存太小，会影响后续的内存分配。
+
+老生代采用了标记清除法和标记压缩法。标记清除法首先会对内存中存活的对象进行标记，标记结束后清除掉那些没有标记的对象。由于标记清除后会造成很多的内存碎片，不便于后面的内存分配。所以了解决内存碎片的问题引入了标记压缩法。
+
+由于在进行垃圾回收的时候会暂停应用的逻辑，对于新生代方法由于内存小，每次停顿的时间不会太长，但对于老生代来说每次垃圾回收的时间长，停顿会造成很大的影响。 为了解决这个问题 V8 引入了增量标记的方法，将一次停顿进行的过程分为了多步，每次执行完一小步就让运行逻辑执行一会，就这样交替运行。
+```
+
+### 哪些操作会造成内存泄漏？
+
+- 1.意外的全局变量
+- 2.被遗忘的计时器或回调函数
+- 3.脱离 DOM 的引用
+- 4.闭包
+
+- 第一种情况是我们由于使用未声明的变量，而意外的创建了一个全局变量，而使这个变量一直留在内存中无法被回收。
+- 第二种情况是我们设置了`setInterval`定时器，而忘记取消它，如果循环函数有对外部变量的引用的话，那么这个变量会被一直留在内存中，而无法被回收。
+- 第三种情况是我们获取一个DOM元素的引用，而后面这个元素被删除，由于我们一直保留了对这个元素的引用，所以它也无法被回收。
+- 第四种情况是不合理的使用闭包，从而导致某些变量一直被留在内存当中。
+
+解决：减少不必要的全局变量，使用完数据后，及时解除引用
 
 
 ## 原型与原型链
@@ -3374,7 +3317,7 @@ Promise.prototype.catch()：捕获异常
 
 将传入 Promise.all 的数组进行遍历，如果 catch 住 reject 结果，直接返回，这样就可以在最后结果中将所有结果都获取到
 
-ES11：Promise.settled()
+ES11：Promise.allSettled()
 
 ## 简述箭头函数
 
@@ -3935,6 +3878,46 @@ DNS域名解析 >>> TCP分包 >>> IP寻路 >>> 找到服务器IP >>> TCP三次�
 
 # HTTP
 
+**HTTP协议的主要特点**:简单快速 灵活（通过一个http协议就能完成不同数据类型的传输） 无连接(连接一次后就断开，不会保持连接) 无状态 (客户端服务端两种身份，连接一次就断开，下一次连接不会知道上次连接状态)
+
+**HTTP报文的组成部分**：
+
+请求报文：请求行、请求头、空行、请求体
+
+响应报文：状态行、响应头、空行、响应体 
+
+**HTTP持久连接**(1.1版本才支持)
+
+**非持久连接**：HTTP协议采用“请求应答”模式,当使用普通模式,即非Keep-Aive模式时,每个请求应答客
+户和服务器都要新建一个连接,完成之后立即断开连接(HTTP协议为无连接的协议)
+
+**持久连接**：当使用κeep-Aive模式(又称持久连接、连接重用)时,Keeρ-Aive功能使客户端到服务器端
+的连接持续有效,当岀现对服务器的后继请求时,Keep-Aive功能避免了建立或者重新建立连接
+
+**HTTP管线化**
+
+在使用持久连接的情况下,某个连接上消息的传递类似于
+请求1~>响应1→>请求2→>响应2-→请求3→>响应3
+
+管线化  某个连接上的消息变成了类似这样
+请求1->请求2→>请求3→>响应1-→>响应2→>响应3
+
+特点：
+
+**管线化机制通过持久连接完成,仅HTTP/1.1支持此技术**
+**只有GET和HEAD请求可以进行管线化,而POST则有所限制**
+**初次创建连接时不应启动管线机制,因为对方(服务器)不一定支持HTTP/1.1版本的协议**
+管线化不会影响响应到来的顺序,如上面的例子所示,响应返回的顺序并未改变
+HTTP∧1.1要求服务器端支持管线化,但并不要求服务器端也对响应进行管线化处理,只是
+要求对于管线化的请求不失败即可
+由于上面提到的服务器端问题,开启管线化很可能并不会带来大幅度的性能提升,而且很多服务
+器端和代理程序对管线化的支持并不好,因此现代浏览器如 Chrome和 Firefox默认并未开启管线
+化支持
+
+## HTTP加密过程
+
+1、浏览器将自己支持的一套加密规则发送给网站。 2、网站从中选出一组加密算法与HASH算法，并将自己的身份信息以证书的形式发回给浏览器。证书里面包含了网站地址，加密公钥，以及证书的颁发机构等信息。 3、获得网站证书之后浏览器要做以下工作： (1) 验证证书的合法性（颁发证书的机构是否合法，证书中包含的网站地址是否与正在访问的地址一致等），如果证书受信任，则浏览器栏里面会显示一个小锁头，否则会给出证书不受信的提示。 (2) 如果证书受信任，或者是用户接受了不受信的证书，浏览器会生成一串随机数的密码，并用证书中提供的公钥加密。 (3) 使用约定好的HASH计算握手消息，并使用生成的随机数对消息进行加密，最后将之前生成的所有信息发送给网站。 4、网站接收浏览器发来的数据之后要做以下的操作： (1) 使用自己的私钥将信息解密取出密码，使用密码解密浏览器发来的握手消息，并验证HASH是否与浏览器发来的一致。 (2) 使用密码加密一段握手消息，发送给浏览器。 5、浏览器解密并计算握手消息的HASH，如果与服务端发来的HASH一致，此时握手过程结束，之后所有的通信数据将由之前浏览器生成的随机密码并利用对称加密算法进行加密
+
 ## TCP三次握手
 
 第一次握手：客户端向服务端发送带有syn的数据包，此时客户端变为半打开状态，服务端接收到syn的数据包，服务端也变为半打开状态
@@ -3999,7 +3982,7 @@ DNS域名解析 >>> TCP分包 >>> IP寻路 >>> 找到服务器IP >>> TCP三次�
 
 ## HTTP状态码
 
-### 1XX（信息性状态码）
+### 1XX（信息性状态码 指示信息）
 
 表示接收的请求正在处理
 
@@ -4027,7 +4010,7 @@ DNS域名解析 >>> TCP分包 >>> IP寻路 >>> 找到服务器IP >>> TCP三次�
 
 303：查看其他位置，用GET方法定向获取请求的资源
 
-304：未修改，自从上次请求后，请求的网页未修改过。服务器返回此响应，不会返回网页的内容
+304：未修改，自从上次请求后，请求的网页未修改过。服务器返回此响应，不会返回网页的内容，原来缓冲过的文档还可以继续使用
 
 307：临时重定向，不指定用什么方法请求重定向地址
 
@@ -4068,6 +4051,16 @@ DNS域名解析 >>> TCP分包 >>> IP寻路 >>> 找到服务器IP >>> TCP三次�
 ### OPTIONS：询问支持的方法
 
 ## GET和POST的区别
+
+**GET在浏览器回退时是无害的,而POST会再次提交请求**
+GET产生的URL地址可以被收藏,而POST不可以
+**GET请求会被浏览器主动缓存,而POST不会,除非手动设置**
+GET请求只能进行ur编码,而POST支持多种编码方式
+**GET请求参数会被完整保留在浏览器历史记录里,而POST中的参数不会被保留**
+**GET请求在URL中传送的参数是有长度限制的,而POST没有限制**
+对参数的数据类型,GET只接受ASC字符,而POST没有限制
+GET比POST更不安全,因为参数直接暴露在URL上,所以不能用来传递敏感信息
+**GET参数通过URL传递,POST放在 Request body中**
 
 1.语义不同：GET用来获取数据，POST用来提交数据
 

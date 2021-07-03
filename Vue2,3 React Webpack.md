@@ -129,10 +129,17 @@ setup(){
 
 
 1. $parent,$children 获取当前组件的父组件和当前组件的子组件
+
 2. $attrs 和$listeners A->B->C。Vue 2.4 开始提供了$attrs 和$listeners 来解决这个问题 (跨级)
+
+   inheritAttrs：false 元素不会设置在父dom上，自定义给子元素
+
 3. 父组件中通过 provide 来提供变量，然后在子组件中通过 inject 来注入变量。(官方不推荐在实际业务中使用，但是写组件库时很常用) (跨级)
+
 4. $refs 获取组件实例
+
 5. envetBus 兄弟组件数据传递 这种情况下可以使用事件总线的方式， 这种方法通过**一个空的 Vue实例作为中央事件总线（事件中心**），用它来触发事件和监听事件，从而实现任何组件间的通信，包括父子、隔代、兄弟组件
+
 6. vuex 状态管理 (跨级)
 
 #### 4 Vue 的生命周期方法有哪些 一般在哪一步发请求
@@ -950,6 +957,46 @@ export function nextTick(cb) {
 ```
 
 nextTick 原理详解 [传送门](https://juejin.cn/post/6939704519668432910#heading-4)
+
+Vue是异步执⾏dom更新的，⼀旦观察到数据变化，Vue就会开启⼀个**异步队列**，然后把在同
+
+⼀个事件循环 (event loop) 当中观察到数据变化的 watcher 推送进这个队列。如果这个
+
+watcher被触发多次，只会被推送到队列⼀次。
+
+这种缓冲⾏为可以有效的去掉重复数据造成的不必要的计算和DOm操作。⽽在下⼀个事件循
+
+环时，Vue会清空队列，并进⾏必要的DOM更新。
+
+⽽vue内部这个异步队列是怎么开启的? 这⾥有⼀个优先级, Promise.then > 
+
+MutationObserver > setImmediate > setTimeout
+
+所以可以理解为, nextTick会优先尝试使⽤微任务, 如果浏览器不⽀持, 就⽤宏任务.当你设置 vm.someData = ‘new value’，DOM 并不会⻢上更新，⽽是在异步队列被清除，也
+
+就是下⼀个事件循环开始时执⾏更新时才会进⾏必要的DOM更新.
+
+所以nextTick的回调是在下⼀轮事件循环⾥执⾏的.
+
+⼀般在什么时候⽤到nextTick呢? 
+
+1. 在数据变化后要执⾏的某个操作，⽽这个操作需要使⽤随数据改变⽽改变的DOM结构的时
+
+   候，这个操作都应该放进Vue.nextTick()的回调函数中
+
+   ```javascript
+   <template>
+    <div v-if="loaded" ref="test"></div>
+   </template>
+   async showDiv() {
+    this.loaded = true;
+    //this.$refs.test.xxxxx;  拿不到
+    await Vue.nextTick();
+    this.$refs.test.xxxxx; 
+   }
+   ```
+
+   
 
 #### 29 keep-alive 使用场景和原理
 
@@ -1978,7 +2025,26 @@ function changeRef() {
 
 # React
 
+## React的优点
+
+1.声明式编程
+
+2.组件化编程
+
+3.支持客户端和服务端渲染
+
+4.高效：原因在于虚拟DOM和Diff算法
+
+## 虚拟DOM与Diff算法
+
+虚拟DOM本质上是一个轻量的JavaScript对象，它是真实DOM的一个副本
+
+在setState之后创建新的虚拟DOM树，与旧的虚拟DOM树通过Diff算法进行比较
+
+多次setState合并操作，记录比较差异，最终将差异绘制到真实DOM，进行局部更新
+
 ## 你的技术栈主要是react，那你说说你⽤react有什么坑点？
+
 1、JSX做表达式判断时候，需要强转为boolean类型，如：
 
 ```javascript
@@ -2095,6 +2161,7 @@ PS: componentWillMount componentWillReceiveProps componentWillUpdate ⼏个⽣�
 - 在 React  中你不能通过返回 false  来阻⽌默认⾏为。必须明确调⽤ preventDefault 。
 
 ## React的合成事件是什么？
+
 React  根据 W3C  规范定义了每个事件处理函数的参数，即合成事件。
 
 事件处理程序将传递 SyntheticEvent  的实例，这是⼀个跨浏览器原⽣事件包装器。它具有与浏览器 原⽣事件相同的接⼝，包括 stopPropagation()  和 preventDefault() ，在所有浏览器中他们⼯作 ⽅式都相同。
@@ -2577,4 +2644,6 @@ Vue项目中遇到视图不更新，方法不执行，埋点不触发等问题
 4.自动化：
     任何简单机械的重复劳动都应该让机器去完成，比如自动化测试、自动化部署等
 ```
+
+
 
